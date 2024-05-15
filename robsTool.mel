@@ -1,0 +1,2322 @@
+////////// Robs Rigging Tool V 2.5 //////////
+/// Created By: Rob Webb
+///
+/// Email: RobertWebb.3d@gmail.com
+///
+///http://robertwebb3d.wixsite.com/robertwebb3d
+///
+//////////
+
+string $RRT2 = "RobsRiggingToolsV2";
+//if (`dockControl -q -ex RRTdockWindow`) { deleteUI RRTdockWindow; }
+
+
+if (`window -q -ex $RRT2`) { deleteUI $RRT2; }
+
+window -s false -mxb false -rtf false -tlb true -nde false -w 160 -h 305 -title "Rob's Rigging Tools V.2.5" $RRT2;
+        
+        columnLayout -adjustableColumn true;
+			rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+			button -label "Freeze Transforms" -w 156 -command "ftButtonAction()";
+			setParent..;
+			rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+			button -label "Delete History" -w 156 -command "dhButtonAction()";
+			setParent..;
+			rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+			button -label "Group Objects" -ann "Puts selected objects in a group and prompts for the name" -w 80 -command "createGroupButtonAction()";
+			button -label "Empty Group" -ann "Creates an empty group and prompts for the name" -w 74 -command "createNullButtonAction()";
+			setParent..;
+			rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+			text -label "Name";
+			string $myName = `textField -w 124 myName`;
+			setParent..;
+			rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+			button -label "Rename Selected Objects" -ann "Renames selected object with text field entry" -w 156 -command "renameButtonAction()";
+			setParent..;
+			rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+			button -label "Add Prefix" -ann "Adds text field entry as Prefix to all selected objects" -w 77 -command "addPrefixButtonAction()";
+			button -label "Add Suffix" -ann "Adds text field entry as Suffix to all selected objects" -w 77 -command "addSuffixButtonAction()";
+			setParent..;
+			rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+			button -label "Select Prefix" -ann "Selects objects with the Prefix in the text field" -w 77 -command "selectPrefixButtonAction()";
+			button -label "Select Suffix" -ann "Selects objects with the Suffix in the text field" -w 77 -command "selectSuffixButtonAction()";
+			setParent..;
+		setParent..;
+
+
+		frameLayout -cl true -cll true -bgc .1 .1 .2 -label "Joints & Naming"
+		-cc ("window -e -h (`window -q -h $RRT2` - " + 252 + ") $RRT2")
+		-ec ("window -e -h (`window -q -h $RRT2` + " + 252 + ") $RRT2");
+
+
+			columnLayout;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Joint Tool" -ann "Normal joint tool" -w 90 -command "jointToolButtonAction()";
+				button -label "Joint Size" -ann "Change the joint size" -w 62 -command "jointSizeButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Joint at Center of Selected" -ann "Creates a joint at the center of selected verts/edges/faces" -w 154 -command "createJointAtLoopWOButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Joint at Every Vert Selected" -ann "Creates a joint at every vert for selected verts/edges/faces" -w 154 -command "createJointAtVertButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Select All Joints" -ann "Selects all the joints in the scene" -w 110 -command "selectAllJointsButtonAction()";
+				button -label "LRAs" -ann "Turn on or off the LRAs for the selected objects" -w 42 -command "lraButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Parent in Order of Selection" -ann "Normal joint tool" -w 154 -command "parentObjectsButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Orient Joint Options" -ann "Orient joints" -w 154 -command "orientJointsOptionsButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Mirror Joint Options" -ann "Mirror joint options" -w 154 -command "mirrorJointOptionsButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Mirror L->R" -bgc 1 0.5 0.5 -ann "Mirrors the currently selected joints from Left to Right from the origin" -w 76 -command "mirrorJointsLTRButtonAction()";
+				button -label "Mirror R->L" -bgc 0.5 0.5 1 -ann "Mirrors the currently selected joints from Right to Left from the origin" -w 76 -command "mirrorJointsRTLButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Prefix Hierarchy Names" -ann "Prefix hierarchy name tool" -w 154 -command "phnButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Search and Replace" -ann "Search and Replace tool" -w 154 -command "sarButtonAction()";
+				setParent..;
+			setParent..;
+		setParent..;
+
+
+		frameLayout -cl true -cll true -bgc .1 .1 .4 -label "Skinning & Weighting"
+		-cc ("window -e -h (`window -q -h $RRT2` - " + 229 + ") $RRT2")
+		-ec ("window -e -h (`window -q -h $RRT2` + " + 229 + ") $RRT2");
+		//-cc ("window -e -h (`window -q -h $RRT2` - " + 228 + ") $RRT2")
+		//-ec ("window -e -h (`window -q -h $RRT2` + " + 228 + ") $RRT2");
+
+			columnLayout;
+				rowLayout -numberOfColumns 4 -columnWidth3 70 70 100;
+				button -label "Bind Skin" -ann "Bind skin tool" -w 75 -command "bindSkinButtonAction()";
+				button -label "Detach Skin" -ann "Detatch skin tool" -w 77 -command "detachSkinButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Paint Skin Weights Tool" -ann "Turn on or off the LRAs for the selected objects" -w 154 -command "paintWeightsButtonAction()";
+				setParent..;
+				text "/////////   Smoothing %   ////////";
+				rowLayout -numberOfColumns 7 -columnWidth3 0 0 0;
+				button -label "10" -w 24 -command "smoothing10ButtonAction()";
+				button -label "25" -w 24 -command "smoothing25ButtonAction()";
+				button -label "50" -w 24 -command "smoothing50ButtonAction()";
+				button -label "75" -w 24 -command "smoothing75ButtonAction()";
+				button -label "90" -w 24 -command "smoothing90ButtonAction()";
+				button -label "100" -w 24 -command "smoothing100ButtonAction()";
+				setParent..;
+				text "/////////   Weighting %   ////////";
+				rowLayout -numberOfColumns 7 -columnWidth3 0 0 0;
+				button -label "0" -w 20 -command "weighting0ButtonAction()";
+				button -label "10" -w 20 -command "weighting10ButtonAction()";
+				button -label "25" -w 20 -command "weighting25ButtonAction()";
+				button -label "50" -w 20 -command "weighting50ButtonAction()";
+				button -label "75" -w 20 -command "weighting75ButtonAction()";
+				button -label "90" -w 20 -command "weighting90ButtonAction()";
+				button -label "100" -w 22 -command "weighting100ButtonAction()";
+				setParent..;
+				//rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				//button -label "Create Base Weighting (WIP)" -ann "Creates a base weighting for the mesh as well as base smoothing around joints" -w 154 -command "baseWeightButtonAction()";
+				//setParent..;
+				rowLayout -numberOfColumns 4 -columnWidth3 0 0 0;
+				text "  Joint Selection:  ";
+				button -label "On" -w 30 -command "jointSelOnButtonAction()";
+				button -label "Off" -w 30 -command "jointSelOffButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Select Verts by Joint" -ann "Selects the verts influenced by selected joint or joints" -w 154 -command "vertsByJointButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Convert Selection to Verts" -ann "Converts the current edges/faces to vert selection" -w 154 -command "convertToVertsButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 4 -columnWidth3 70 70 100;
+				button -label "Grow Sel (+)" -ann "Grows current selection by one vert" -w 76 -command "growSelButtonAction()";
+				button -label "Shrink Sel (-)" -ann "Shrinks current selection by one vert" -w 76 -command "shrinkSelButtonAction()";
+				setParent..;
+			setParent..;
+		setParent..;
+
+
+		frameLayout -cl true -cll true -bgc .1 .1 .6 -label "Controls & Groups"
+		-cc ("window -e -h (`window -q -h $RRT2` - " + 349 + ") $RRT2")
+		-ec ("window -e -h (`window -q -h $RRT2` + " + 349 + ") $RRT2");
+
+			columnLayout;
+			optionMenu -cc "nurbsButtonAction()" -w 155 -ann "Creates selected controller type from drop down menu and puts it within a group with the same name" shapeCheck;
+				menuItem -label "Circle";
+				menuItem -label "Square";
+				menuItem -label "Triangle";
+				menuItem -label "Bowling Pin";
+				menuItem -label "Cube";	
+				menuItem -label "Sphere";
+				menuItem -label "Plane";
+				menuItem -label "Cone";
+				rowLayout -numberOfColumns 7 -columnWidth3 0 0 0;
+				checkBox -label "Options     |" -ann "Opens the option box for selected controller type" nurbsOptioncheck;
+				checkBox -label "Orient" -ann "Orients the created controller to the selected objects pivot" orientToObjectcheck;
+				setParent..;
+				rowLayout -numberOfColumns 7 -columnWidth3 0 0 0;
+				text "Rotate";
+				button -label "X" -bgc 1 0.2 0.2 -ann "" -w 15 -command "rotateXButtonAction()";
+				button -label "Y" -bgc 0.2 1 0.2-ann "" -w 15 -command "rotateYButtonAction()";
+				button -label "Z" -bgc 0.2 0.2 1 -ann "" -w 15 -command "rotateZButtonAction()";
+				text "| Scale";
+				button -label "+" -ann "" -w 15 -command "scalePlusButtonAction()";
+				button -label "-" -ann "" -w 15 -command "scaleMinusButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Orient 1st to 2nd Sel Object" -w 154 -command "orientObjectButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Orient 1st to 2nd Sel Pivot" -w 154 -command "orientPivotButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Locator at Obj" -ann "Create locator at pivot and orient it" -w 80 -command "topLocatorButtonAction()";
+				checkBox -label "Prnt Over" -ann "Parents the selected objects inside their respecive groups" parentOverOptioncheck;
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Select All Locators" -w 154 -command "selectLocatorsButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Selected Locators > Groups" -w 154 -command "deleteLocatorShapesButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Selected Groups > Locators" -w 154 -command "addLocatorShapesButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Dup Object to Center Pivot" -ann "Duplicates the first selected object to the other selected objects and orients it" -w 154  -command "createObjectAtPivotButtonAction()";
+				setParent..;
+				text "/// Change Color Of Curves ///";
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				$edgeColor = `colorSliderGrp -cw 1 40 -cw 2 110 edgeColor`;
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Set Color" -w 154 -command "setColorButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 7 -columnWidth3 0 0 0;
+				button -label "" -w 24 -bgc 1 0.5 0.6 -command "pinkColorButtonAction()";
+				button -label "" -w 24 -bgc 1 0.2 0.2 -command "redColorButtonAction()";
+				button -label "" -w 24 -bgc 1 1 0.2 -command "yellowColorButtonAction()";
+				button -label "" -w 24 -bgc 1 0.2 1 -command "magentaColorButtonAction()";
+				button -label "" -w 24 -bgc 0.2 0.2 1 -command "blueColorButtonAction()";
+				button -label "" -w 23 -bgc 0.2 1 0.8 -command "cyanColorButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Parent Curves to 1st Sel Obj" -ann "Parents the selected nurbs curves to the first selected shape node (turn shape node visibility on)" -w 154 -command "parButtonAction()";
+				setParent..;
+			setParent..;
+		setParent..;
+
+
+		frameLayout -cl true -cll true -bgc .1 .1 .8 -label "Constraints & IK"
+		-cc ("window -e -h (`window -q -h $RRT2` - " + 195 + ") $RRT2")
+		-ec ("window -e -h (`window -q -h $RRT2` + " + 195 + ") $RRT2");
+
+			columnLayout;
+				text "Select Controller > Controlled";
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Point" -w 76 -ann "Point constraint" -command "pointConstraintButtonAction()";
+				button -label "Orient" -w 76 -ann "Orient constraint" -command "orientConstraintButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Scale" -w 76 -ann "Scale constraint" -command "scaleConstraintButtonAction()";
+				button -label "Parent" -w 76 -ann "Parent constraint" -command "parentConstraintButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Aim" -w 76 -ann "Aim constraint" -command "aimConstraintButtonAction()";
+				button -label "Pole Vector" -w 76 -ann "Pole Vector constraint" -command "poleVectorConstraintButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				checkBox -label "With Offset" offsetcheck;
+				checkBox -label "Options" optionBoxcheck;
+				setParent..;
+				button -label "Remove Target" -bgc 1 0.2 0.2 -w 156 -ann "Removes the current constraint from the selected objects" -command "removeTargetButtonAction()";
+				text "////////////   IK Tools   ////////////";
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "IK Handle Tool" -ann "Normal IK tool" -w 100 -command "ikToolButtonAction()";
+				button -label "Options" -ann "Normal IK tool" -w 52 -command "ikToolOptionsButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "IK Spline Tool" -ann "Normal IK Spline Tool" -w 100  -command "ikSplineToolButtonAction()";
+				button -label "Options" -ann "Normal IK Spline Tool" -w 52  -command "ikSplineToolOptionsButtonAction()";
+				setParent..;
+			setParent..;
+		setParent..;
+
+
+		frameLayout -cl true -cll true -bgc .1 .1 1 -label "Hierarchy & Channels"
+		-cc ("window -e -h (`window -q -h $RRT2` - " + 165 + ") $RRT2")
+		-ec ("window -e -h (`window -q -h $RRT2` + " + 165 + ") $RRT2");
+
+
+			columnLayout;
+				rowLayout -numberOfColumns 4 -columnWidth3 0 0 0;
+				button -label "Replace" -ann "Replaces the first selected item with the second selected item in the hierarchy" -w 50 -command "replaceInHierarchyButtonAction()";
+				button -label "Insert" -ann "Inserts the first selected object into the hierarchy above the second selected object" -w 50 -command "insertInHierarchyButtonAction()";
+				button -label "Remove" -ann "Removes the currently selected item in the hierarchy" -w 50 -command "removeFromHierarchyButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Select Children and Parent" -ann "selects all of the children of the currently selected object" -w 154 -command "selectChildrenButtonAction()";
+				setParent..;
+				text "//// Select Channels to Use ////";
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Lock" -ann "Locks the currently selected channels" -w 76 -command "lockedButtonAction()";
+				button -label "Unlock" -ann "Unlocks the currently selected channels" -w 76 -command "unlockedButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Hide" -ann "Hides the currently selected channels" -w 76 -command "hiddenButtonAction()";
+				button -label "Unhide All" -ann "Unhides all the channels of the currently selected item" -w 76 -command "unhiddenButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Lock And Hide Selected" -ann "Locks and hides the currently selected channels" -w 154 -command "lockAndHideButtonAction()";
+				setParent..;
+				rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+				button -label "Nonkeyable" -ann "Makes the currently selected channels nonkeyable" -w 76 -command "nonkeyableButtonAction()";
+				button -label "Keyable" -ann "Makes the currently selected channels keyable" -w 76 -command "keyableButtonAction()";
+				setParent..;
+			setParent ..;
+		setParent ..;
+
+
+		frameLayout -cl true -cll true -bgc .3 .1 .3 -label "Bugs & Contact Info"
+		-cc ("window -e -h (`window -q -h $RRT2` - " + 221 + ") $RRT2")
+		-ec ("window -e -h (`window -q -h $RRT2` + " + 221 + ") $RRT2");
+
+
+			columnLayout;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				scrollField -w 154 -wordWrap true -editable false -text "This tool set is always a work in progress. If you have comments, questions, bugs, or additions please email me at Rwebb303@gmail.com, or click the button below. I appreciate it!" ;
+				setParent ..;
+				rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+				button -label "Email me" -w 154 -command "emailMeButtonAction()";
+				setParent ..;
+			setParent ..;
+		setParent ..;
+
+//dockControl -w 160 -fw 160 -ret false -po true -a "left" -fl true -content $RRT2 -l "RRTV2.5" RRTdockWindow;
+//workspaceControl -edit -visible false $RRT2;
+//////////Commands//////////
+
+
+//Freeze transforms//
+global proc ftButtonAction() {
+
+FreezeTransformations;
+}
+
+
+//Delete History//
+global proc dhButtonAction() {
+
+DeleteHistory;
+}
+
+
+//Group//
+global proc createGroupButtonAction() {
+
+	string $text;
+	string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+	if ($result == "OK") {
+  	  $text = `promptDialog -query -text`;
+	}
+
+group -n $text;
+}
+
+
+//Null//
+global proc createNullButtonAction() {
+
+	string $text;
+	string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+	if ($result == "OK") {
+  	  $text = `promptDialog -query -text`;
+	}
+
+group -em -n $text;
+}
+
+
+//Rename//
+global proc renameButtonAction() {
+
+string $name =`textField -q -text myName`;
+
+string $select[] = `ls -sl`;
+
+int $bar = 1;
+
+for ( $node in $select )
+{
+
+select -cl;
+
+select $node;
+rename ($name + $bar++ + "\n");
+
+}
+
+select -cl;
+
+select -add ($name + 1 + "\n");
+rename ($name + "\n");
+}
+
+
+//Add prefix//
+global proc addPrefixButtonAction() {
+
+string $name =`textField -q -text myName`;
+
+string $select[] = `ls -sl`;
+for ( $node in $select ) {
+
+select -cl;
+select $node;
+
+$itemname = `ls -sl`;
+
+rename ($name + $itemname[0]);
+}
+
+}
+
+
+//Add suffix//
+global proc addSuffixButtonAction() {
+
+string $name =`textField -q -text myName`;
+
+string $select[] = `ls -sl`;
+for ( $node in $select ) {
+
+select -cl;
+select $node;
+
+$itemname = `ls -sl`;
+
+rename ($itemname[0] + $name);
+}
+	
+}
+
+
+//Select prefix//
+global proc selectPrefixButtonAction() {
+
+string $name =`textField -q -text myName`;
+
+select -r (""+ $name +"*");
+
+}
+
+
+//Select suffix//
+global proc selectSuffixButtonAction() {
+
+string $name =`textField -q -text myName`;
+
+select -r ("*"+ $name +"");
+	
+}
+
+
+
+////////////////////////////// Joints and Naming //////////////////////////////
+
+
+//Joint tool//
+global proc jointToolButtonAction() {
+
+JointTool;
+}
+
+
+//LRAs//
+global proc lraButtonAction() {
+
+ToggleLocalRotationAxes;
+}
+
+
+//Create joint at loop//
+global proc createJointAtLoopWOButtonAction() {
+
+	string $select[] = `ls -sl`;
+	string $text;
+	string $result = `promptDialog 
+	     -title "Name Object"
+	     -message "Joint Name:"
+	     -button "OK" -button "Cancel"
+	     -defaultButton "OK" -cancelButton "Cancel"
+	     -dismissString "Cancel"`;
+
+	if ($result == "OK") {
+	     $text = `promptDialog -query -text`;
+	     print ($text + "\n");
+	}
+	setToolTo moveSuperContext; 
+	vector $v = `manipMoveContext -q -p Move`; 
+	joint -n $text -p ($v.x) ($v.y) ($v.z); 
+	xform -cp;
+	parent -w;
+}
+
+
+//Create joint at every Vert//
+global proc createJointAtVertButtonAction() {
+
+ConvertSelectionToVertices;
+
+string $vertSelec [] = `ls -sl`;
+string $allVertices [] = `filterExpand -sm 31`;
+
+print $allVertices;//shows what the array looks like
+
+for ( $node in $allVertices )
+{
+select $node;
+setToolTo moveSuperContext; 
+	vector $v = `manipMoveContext -q -p Move`; 
+	joint -p ($v.x) ($v.y) ($v.z); 
+	string $joints[] = `ls -sl`;
+	
+parent -w;
+}
+}
+
+
+//Select all joints//
+global proc selectAllJointsButtonAction() {
+
+SelectAllJoints;
+}
+
+
+//Joint size//
+global proc jointSizeButtonAction() {
+
+jdsWin;
+}
+
+
+//Parent objects in order of selection//
+global proc parentObjectsButtonAction() {
+
+string $select[] = `ls -sl`;
+
+int $bar = 0;
+
+for ( $node in $select )
+{
+select -add $select[$bar++];
+
+$size = `ls -sl`;
+
+if (size($size) > 1) { parent; }
+
+else { select -cl; }
+
+//parent;
+}
+}
+
+
+//Orient joint options//
+global proc orientJointsOptionsButtonAction() {
+
+OrientJointOptions;
+}
+
+
+//Mirror joints options//
+global proc mirrorJointOptionsButtonAction() {
+
+MirrorJointOptions;
+}
+
+
+//Mirror joints L to R//
+global proc mirrorJointsLTRButtonAction() {
+
+mirrorJoint -mirrorYZ -mirrorBehavior -searchReplace "L_" "R_";
+}
+
+
+//Mirror joints R to L//
+global proc mirrorJointsRTLButtonAction() {
+
+mirrorJoint -mirrorYZ -mirrorBehavior -searchReplace "R_" "L_";
+}
+
+
+//Prefix higharchy names//
+global proc phnButtonAction() {
+
+PrefixHierarchyNames;
+}
+
+
+//Search and Replace names//
+global proc sarButtonAction() {
+
+performSearchReplaceNames 1;
+}
+
+
+////////////////////////////// Skinning and Weighting //////////////////////////////
+
+
+//Bind Skin//
+global proc bindSkinButtonAction() {
+
+SmoothBindSkinOptions;
+}
+
+
+//Detach Skin//
+global proc detachSkinButtonAction() {
+
+DetachSkin;
+}
+
+
+//Paint Skin Weights Tool//
+global proc paintWeightsButtonAction() {
+
+ArtPaintSkinWeightsToolOptions;
+}
+
+
+//Smoothing 10%//
+global proc smoothing10ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Smooth;
+
+artAttrSkinPaintCtx -e -opacity .1 `currentCtx`;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Smoothing 25%//
+global proc smoothing25ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Smooth;
+
+artAttrSkinPaintCtx -e -opacity .25 `currentCtx`;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Smoothing 50%//
+global proc smoothing50ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Smooth;
+
+artAttrSkinPaintCtx -e -opacity .5 `currentCtx`;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Smoothing 75%//
+global proc smoothing75ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Smooth;
+
+artAttrSkinPaintCtx -e -opacity .75 `currentCtx`;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Smoothing 90%//
+global proc smoothing90ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Smooth;
+
+artAttrSkinPaintCtx -e -opacity .9 `currentCtx`;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Smoothing 100%//
+global proc smoothing100ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Smooth;
+
+artAttrSkinPaintCtx -e -opacity 1.0 `currentCtx`;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Weighting 0%//
+global proc weighting0ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Replace;
+
+artAttrSkinPaintCtx -e -opacity 1 `currentCtx`;
+
+artSkinSetSelectionValue 0.0 false artAttrSkinPaintCtx artAttrSkin;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Weighting 10%//
+global proc weighting10ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Replace;
+
+artAttrSkinPaintCtx -e -opacity 1 `currentCtx`;
+
+artSkinSetSelectionValue 0.1 false artAttrSkinPaintCtx artAttrSkin;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Weighting 25%//
+global proc weighting25ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Replace;
+
+artAttrSkinPaintCtx -e -opacity 1 `currentCtx`;
+
+artSkinSetSelectionValue 0.25 false artAttrSkinPaintCtx artAttrSkin;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Weighting 50%//
+global proc weighting50ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Replace;
+
+artAttrSkinPaintCtx -e -opacity 1 `currentCtx`;
+
+artSkinSetSelectionValue 0.5 false artAttrSkinPaintCtx artAttrSkin;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Weighting 75%//
+global proc weighting75ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Replace;
+
+artAttrSkinPaintCtx -e -opacity 1 `currentCtx`;
+
+artSkinSetSelectionValue 0.75 false artAttrSkinPaintCtx artAttrSkin;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Weighting 90%//
+global proc weighting90ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Replace;
+
+artAttrSkinPaintCtx -e -opacity 1 `currentCtx`;
+
+artSkinSetSelectionValue 0.9 false artAttrSkinPaintCtx artAttrSkin;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Weighting 100%//
+global proc weighting100ButtonAction() {
+
+artAttrPaintOperation artAttrSkinPaintCtx Replace;
+
+artAttrSkinPaintCtx -e -opacity 1 `currentCtx`;
+
+artSkinSetSelectionValue 1.0 false artAttrSkinPaintCtx artAttrSkin;
+
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+}
+
+
+//Joint selection on//
+global proc jointSelOnButtonAction() {
+
+setObjectPickMask "Joint" true;
+}
+
+
+
+//Joint selection off//
+global proc jointSelOffButtonAction() {
+
+setObjectPickMask "Joint" false;
+}
+
+
+//Create base weighting window//
+global proc baseWeightButtonAction() {
+
+if ( `window -exists BWTWindow` ) {
+    deleteUI BWTWindow;
+}
+window -s true -mxb false -rtf true -tlb true -nde false -w 100 -title "Base Weight Tool" BWTWindow;
+
+	columnLayout;
+		rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+		string $BWTskin = `textFieldGrp -cw2 25 125 -w 150 -label "Skin:" -text "Skin Here" skin`;
+		button -label "Set" -w 50 -c "string $sel[] = `ls -sl`;textFieldGrp -e -tx $sel[0] skin";
+		setParent..;
+		rowLayout -numberOfColumns 2 -columnWidth3 0 0 0;
+		string $BWTroot = `textFieldGrp -cw2 55 90 -w 150 -label "Root Joint:" -text "Root Joint Here" root`;
+		button -label "Set" -w 50 -c "string $sel[] = `ls -sl`;textFieldGrp -e -tx $sel[0] root";
+		setParent..;
+		rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+		string $BWTsmooth = `intFieldGrp -cw2 85 105 -numberOfFields 1 -value1 3 -label "Smoothing level:" smooth`;
+		setParent..;
+		rowLayout -numberOfColumns 1 -columnWidth3 0 0 0;
+		button -label "Create Base Weights" -w 202 -command "CBWButtonAction()";
+		setParent..;
+	setParent..;
+
+showWindow;
+
+}
+
+
+//Create base weighting button//
+global proc CBWButtonAction() {
+
+string $skin =`textFieldGrp -q -text skin`;
+
+string $root =`textFieldGrp -q -text root`;
+
+select -cl;
+
+select $skin;
+
+select -tgl $root;
+
+skinCluster -mi 1 -omi true;
+
+setAttr "skinCluster1.maxInfluences" 3;
+
+select -cl;
+
+
+
+select $root;
+
+string $select[] = `ls -sl`;
+string $shapes[] = `listRelatives -ad -type transform`;
+select -r $shapes;
+select -tgl $select;
+
+
+
+string $sel[] = `ls -sl`;
+
+for ( $node in $sel )
+{
+
+select -cl;
+
+artSkinInflListChanging $node 0;
+
+}
+
+
+for ( $node in $sel )
+{
+
+select -cl;
+
+select $skin;
+
+SelectVertexMask;
+
+skinCluster -e -selectInfluenceVerts $node -ats skinCluster1;
+
+ConvertSelectionToFaces;
+
+ConvertSelectionToVertices;
+
+ConvertSelectionToVertexPerimeter;
+
+ArtPaintSkinWeightsToolOptions;
+
+artSkinInflListChanged artAttrSkinPaintCtx;
+
+artSkinInflListChanging $node 1;
+
+artAttrPaintOperation artAttrSkinPaintCtx Smooth;
+artAttrSkinPaintCtx -e -opacity 1 `currentCtx`;
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+artAttrSkinPaintCtx -e -clear `currentCtx`;
+
+artSkinInflListChanging $node 0;
+
+toggleSelMode;
+toggleSelMode;
+
+select -cl;
+
+SelectTool;
+}
+}
+
+
+//Select verts by joint//
+global proc vertsByJointButtonAction() {
+
+artSkinSelectVertices("artAttrSkinPaintCtx",0,0);
+}
+
+
+//Convert selection to verts//
+global proc convertToVertsButtonAction() {
+
+ConvertSelectionToVertices;
+}
+
+
+//Convert selection to verts//
+global proc growSelButtonAction() {
+
+GrowPolygonSelectionRegion;
+}
+
+
+//Convert selection to verts//
+global proc shrinkSelButtonAction() {
+
+ShrinkPolygonSelectionRegion;
+}
+
+
+////////////////////////////// Controls and Groups //////////////////////////////
+
+
+//Nurbs Objects//
+global proc nurbsButtonAction() {
+
+string $optionVal = `checkBox -query -value nurbsOptioncheck`;
+
+string $shapesVal = `optionMenu -query -value shapeCheck`;
+
+string $orientVal = `checkBox -query -value orientToObjectcheck`;
+
+{
+	 
+	if ($shapesVal == "Circle")
+		{
+		if ($optionVal == 0)
+		{
+		if ($orientVal == 1)
+		{
+			string $array[] = `ls -sl`;
+			select -d;
+	
+		string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			circle -n $text -c 0 0 0 -nr 0 1 0 -sw 360 -r 1 -d 3 -ut 0 -tol 0.0001 -s 12 -ch 1; objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+
+			select -af $array[0];
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+			parentConstraint -weight 1;
+			parentConstraint -remove;
+			select -d $array[0];
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		if ($orientVal == 0)
+		{
+			string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			circle -n $text -c 0 0 0 -nr 0 1 0 -sw 360 -r 1 -d 3 -ut 0 -tol 0.0001 -s 12 -ch 1; objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		}
+		if ($optionVal == 1)
+		{
+			CreateNURBSCircleOptions;
+		}
+		}
+
+	if ($shapesVal == "Square")
+		{
+		if ($optionVal == 0)
+		{
+		if ($orientVal == 1)
+		{
+			string $array[] = `ls -sl`;
+			select -d;
+	
+		string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			nurbsSquarePreset(0,0,0,0,0,1,0,1,1,16,3,1);
+			string $select[] = `ls -sl`;
+			string $shapes[] = `listRelatives -ad -type shape`;
+			select $shapes;
+			select -add $select;
+			parent -r -s;
+			select -cl;
+			select $select;
+			string $transform[] = `listRelatives -ad -type transform`;
+			select $transform;
+			delete;
+
+			select $select;
+
+			rename (""+ $text +"\n");
+			group;
+			rename (""+ $text +"_GRP\n");
+
+			select -af $array[0];
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+			parentConstraint -weight 1;
+			parentConstraint -remove;
+			select -d $array[0];
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		if ($orientVal == 0)
+		{
+			string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			nurbsSquarePreset(0,0,0,0,0,1,0,1,1,16,3,1);
+			string $select[] = `ls -sl`;
+			string $shapes[] = `listRelatives -ad -type shape`;
+			select $shapes;
+			select -add $select;
+			parent -r -s;
+			select -cl;
+			select $select;
+			string $transform[] = `listRelatives -ad -type transform`;
+			select $transform;
+			delete;
+			
+			select $select;
+
+			rename (""+ $text +"\n");
+			group;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		}
+		if ($optionVal == 1)
+		{
+			CreateNURBSSquareOptions;
+		}
+		}
+
+	if ($shapesVal == "Triangle")
+		{
+		if ($optionVal == 0)
+		{
+		if ($orientVal == 1)
+		{
+			string $array[] = `ls -sl`;
+			select -d;
+	
+		string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			circle -n $text -c 0 0 0 -nr 0 1 0 -sw 360 -r 1 -d 1 -ut 0 -tol 0.01 -s 3 -ch 1; objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+
+			select -af $array[0];
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+			parentConstraint -weight 1;
+			parentConstraint -remove;
+			select -d $array[0];
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		if ($orientVal == 0)
+		{
+			string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			circle -n $text -c 0 0 0 -nr 0 1 0 -sw 360 -r 1 -d 1 -ut 0 -tol 0.01 -s 3 -ch 1; objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		}
+		if ($optionVal == 1)
+		{
+			CreateNURBSCircleOptions;
+		}
+		}
+		
+	if ($shapesVal == "Cube")
+		{
+		if ($optionVal == 0)
+		{
+		if ($orientVal == 1)
+		{
+			string $array[] = `ls -sl`;
+			select -d;
+	
+		string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			nurbsCube -n $text -p 0 0 0 -ax 0 1 0 -w 1 -lr 1 -hr 1 -d 3 -u 1 -v 1 -ch 1; objectMoveCommand;
+			string $select[] = `ls -sl`;
+			string $shapes[] = `listRelatives -ad -type shape`;
+			select $shapes;
+			select -add $select;
+			parent -r -s;
+			select -cl;
+			select $select;
+			string $transform[] = `listRelatives -ad -type transform`;
+			select $transform;
+			delete;
+			
+			select $select;
+
+			group;
+			rename (""+ $text +"_GRP\n");
+
+			select -af $array[0];
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+			parentConstraint -weight 1;
+			parentConstraint -remove;
+			select -d $array[0];
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		if ($orientVal == 0)
+		{
+			string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			nurbsCube -p 0 0 0 -ax 0 1 0 -w 1 -lr 1 -hr 1 -d 3 -u 1 -v 1 -ch 1;
+			
+			string $select[] = `ls -sl`;
+			string $shapes[] = `listRelatives -ad -type shape`;
+			select $shapes;
+			select -add $select;
+			parent -r -s;
+			select -cl;
+			select $select;
+			string $transform[] = `listRelatives -ad -type transform`;
+			select $transform;
+			delete;
+			
+			select $select;
+			createAndAssignShader lambert "";
+			rename (""+ $text +"\n");
+			group;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		}
+		if ($optionVal == 1)
+		{
+			CreateNURBSCubeOptions;
+		}
+		}
+
+	if ($shapesVal == "Sphere")
+		{
+		if ($optionVal == 0)
+		{
+		if ($orientVal == 1)
+		{
+			string $array[] = `ls -sl`;
+			select -d;
+	
+		string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			sphere -n $text -p 0 0 0 -ax 0 1 0 -ssw 0 -esw 360 -r 1 -d 3 -ut 0 -tol 0.01 -s 8 -nsp 4 -ch 1;objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+
+			select -af $array[0];
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+			parentConstraint -weight 1;
+			parentConstraint -remove;
+			select -d $array[0];
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		if ($orientVal == 0)
+		{
+			string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			sphere -n $text -p 0 0 0 -ax 0 1 0 -ssw 0 -esw 360 -r 1 -d 3 -ut 0 -tol 0.01 -s 8 -nsp 4 -ch 1;objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		}
+		if ($optionVal == 1)
+		{
+			CreateNURBSSphereOptions;
+		}
+		}
+
+	if ($shapesVal == "Plane")
+		{
+		if ($optionVal == 0)
+		{
+		if ($orientVal == 1)
+		{
+			string $array[] = `ls -sl`;
+			select -d;
+	
+		string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			nurbsPlane -n $text -p 0 0 0 -ax 0 1 0 -w 1 -lr 1 -d 3 -u 1 -v 1 -ch 1; objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+
+			select -af $array[0];
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+			parentConstraint -weight 1;
+			parentConstraint -remove;
+			select -d $array[0];
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		if ($orientVal == 0)
+		{
+			string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			nurbsPlane -n $text -p 0 0 0 -ax 0 1 0 -w 1 -lr 1 -d 3 -u 1 -v 1 -ch 1; objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		}
+		if ($optionVal == 1)
+		{
+			CreateNURBSPlaneOptions;
+		}
+		}
+
+	if ($shapesVal == "Cone")
+		{
+		if ($optionVal == 0)
+		{
+		if ($orientVal == 1)
+		{
+			string $array[] = `ls -sl`;
+			select -d;
+	
+		string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			cone -n $text -p 0 0 0 -ax 0 1 0 -ssw 0 -esw 360 -r 1 -hr 2 -d 3 -ut 0 -tol 0.01 -s 8 -nsp 1 -ch 1; objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+
+			select -af $array[0];
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+			parentConstraint -weight 1;
+			parentConstraint -remove;
+			select -d $array[0];
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		if ($orientVal == 0)
+		{
+			string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			cone -n $text -p 0 0 0 -ax 0 1 0 -ssw 0 -esw 360 -r 1 -hr 2 -d 3 -ut 0 -tol 0.01 -s 8 -nsp 1 -ch 1; objectMoveCommand;
+			group;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		}
+		if ($optionVal == 1)
+		{
+			CreateNURBSConeOptions;
+		}
+		}
+
+	if ($shapesVal == "Bowling Pin")
+		{
+		if ($optionVal == 0)
+		{
+		if ($orientVal == 1)
+		{
+			string $array[] = `ls -sl`;
+			select -d;
+	
+		string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			circle -n $text -c 0 0 -1.2 -nr 0 1 0 -sw 360 -r 1 -d 3 -ut 0 -tol 0.0001 -s 8 -ch 1; objectMoveCommand;
+			select -r $text.cv[0] ;
+			move -r -os -wd 0.1 0 -6.3 ;
+			select -r $text.cv[1] ;
+			move -r -os -wd 0 0 -7.1 ;
+			select -r $text.cv[2] ;
+			move -r -os -wd -0.1 0 -6.3 ;
+			select -r $text.cv[3] ;
+			move -r -os -wd 1.5 0 -1.1 ;
+			select -r $text.cv[4] ;
+			move -r -os -wd -1.8 0 0.4 ;
+			select -r $text.cv[5] ;
+			move -r -os -wd 0 0 2.8 ;
+			select -r $text.cv[6] ;
+			move -r -os -wd 1.8 0 0.4 ;
+			select -r $text.cv[7] ;
+			move -r -os -wd -1.5 0 -1.1 ;
+			select -cl  ;
+			select -r $text ;
+			group;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			move -rpr 0 0 -21.65 ;
+			FreezeTransformations;
+			pickWalk -d up;
+			
+			select -af $array[0];
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+			parentConstraint -weight 1;
+			parentConstraint -remove;
+			select -d $array[0];
+			pickWalk -d down;
+			setToolTo Rotate;
+		}
+		if ($orientVal == 0)
+		{
+			string $text;
+		string $result = `promptDialog
+	    -title "Name Object"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+		if ($result == "OK") {
+		$text = `promptDialog -query -text`;
+		}
+
+			circle -n $text -c 0 0 0 -nr 0 1 0 -sw 360 -r 1 -d 3 -ut 0 -tol 0.0001 -s 8 -ch 1; objectMoveCommand;
+			select -r $text.cv[0] ;
+			move -r -os -wd 0.1 0 -6.3 ;
+			select -r $text.cv[1] ;
+			move -r -os -wd 0 0 -7.1 ;
+			select -r $text.cv[2] ;
+			move -r -os -wd -0.1 0 -6.3 ;
+			select -r $text.cv[3] ;
+			move -r -os -wd 1.5 0 -1.1 ;
+			select -r $text.cv[4] ;
+			move -r -os -wd -1.8 0 0.4 ;
+			select -r $text.cv[5] ;
+			move -r -os -wd 0 0 2.8 ;
+			select -r $text.cv[6] ;
+			move -r -os -wd 1.8 0 0.4 ;
+			select -r $text.cv[7] ;
+			move -r -os -wd -1.5 0 -1.1 ;
+			select -r $text.cv[0:7] ;
+			move -r -os -wd 0 0 -1.2 ;
+			select -r $text ;
+			setAttr ".translateZ" 0;
+			doGroup 0 1 1;
+			rename (""+ $text +"_GRP\n");
+			pickWalk -d down;
+			FreezeTransformations;
+			setToolTo Rotate;
+		}
+		}
+		if ($optionVal == 1)
+		{
+			
+		}
+		}
+	}
+}
+
+
+//Rotate X//
+global proc rotateXButtonAction() {
+
+rotate 45 0 0;
+FreezeTransformations;
+DeleteHistory;
+}
+
+
+//Rotate Y//
+global proc rotateYButtonAction() {
+
+rotate 0 45 0;
+FreezeTransformations;
+DeleteHistory;
+}
+
+
+//Rotate Z//
+global proc rotateZButtonAction() {
+
+rotate 0 0 45;
+FreezeTransformations;
+DeleteHistory;
+}
+
+
+//Scale Plus//
+global proc scalePlusButtonAction() {
+
+scale 1.2 1.2 1.2;
+FreezeTransformations;
+DeleteHistory;
+}
+
+
+//Scale Minus//
+global proc scaleMinusButtonAction() {
+
+scale .9 .9 .9;
+FreezeTransformations;
+DeleteHistory;
+}
+
+
+//Orient object//
+global proc orientObjectButtonAction() {
+
+string $array[] = `ls -sl`;
+select -d;
+select -r $array[1];
+select -add $array[0];
+doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+parentConstraint -weight 1;
+parentConstraint -remove;
+select -r $array[0];
+}
+
+
+//Orient pivot//
+global proc orientPivotButtonAction() {
+
+string $select[] = `ls -sl`;
+
+select -cl;
+select $select[1];
+
+vector $t = `xform -q -ws -t`;
+
+spaceLocator -name "Delete_Me";
+
+pickWalk -d down;
+
+setAttr ".overrideEnabled" 1;
+setAttr ".overrideColor" 17;
+
+pickWalk -d up;
+
+select -af $select[1];
+doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+parentConstraint -weight 1;
+
+select -d $select[1];
+
+pickWalk -d down;
+pickWalk -d right;
+
+delete;
+
+select -cl;
+select $select[0];
+
+FreezeTransformations;
+xform -piv ($t.x) ($t.y) ($t.z);
+
+select -add $select[1];
+
+parent;
+FreezeTransformations;
+parent -w;
+
+select -cl;
+select -add "Delete_Me";
+delete;
+
+select $select[0];
+}
+
+
+//Add locator at pivot and orient it, then parent selected inside it//
+global proc topLocatorButtonAction() {
+
+string $parentVal = `checkBox -query -value parentOverOptioncheck`;
+
+string $select[] = `ls -sl`;
+for ( $node in $select )
+{
+
+$name = $node;
+
+select -cl;
+
+spaceLocator -name $name;
+rename (""+ $name +"_GRP\n");
+
+pickWalk -d down;
+
+setAttr ".overrideEnabled" 1;
+setAttr ".overrideColor" 17;
+
+pickWalk -d up;
+
+select -af $node;
+doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+parentConstraint -weight 1;
+
+select -d $node;
+
+pickWalk -d down;
+pickWalk -d right;
+
+delete;
+
+if ($parentVal == 1)
+		{
+		select -r $node;
+		select -add (""+ $name +"_GRP\n");
+
+		parent;
+
+		makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 -pn 1;
+		}
+
+		}
+}
+
+
+//Select All Locators//
+global proc selectLocatorsButtonAction() {
+
+string $locators[] = `ls -type locator `;
+select $locators;
+string $locatorShapes[] = `listRelatives -p`;
+select $locatorShapes;
+
+
+}
+
+
+//Turn selected locators into groups//
+global proc deleteLocatorShapesButtonAction() {
+
+string $locatorShapes[] = `listRelatives -s -c`;
+select $locatorShapes;
+
+doDelete;
+
+}
+
+
+//Turn selected groups into locators//
+global proc addLocatorShapesButtonAction() {
+
+string $select[] = `ls -sl`;
+for ( $node in $select ) {
+
+$name = $node;
+
+select -cl;
+
+spaceLocator -name $name;
+rename (""+ $name +"_GRP\n");
+
+pickWalk -d down;
+
+setAttr ".overrideEnabled" 1;
+setAttr ".overrideColor" 17;
+
+select -add $node;
+
+parent -r -s;
+
+select -tgl $node;
+rename (""+ $name +"Shape\n");
+
+select -cl;
+
+select -add (""+ $name +"_GRP\n");
+
+
+
+delete;
+}
+}
+
+
+//Create Object at pivot//
+global proc createObjectAtPivotButtonAction() {
+
+int $sel = 1;
+
+string $select[] = `ls -sl`;
+
+for ( $node in $select )
+{
+select $select[0];
+duplicate -rr;
+
+select -af $node;
+
+doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+parentConstraint -weight 1;
+parentConstraint -remove;
+}
+
+select $select[0];
+doDelete;
+}
+
+
+//Color picker//
+global proc setColorButtonAction() {
+
+vector $edgeColor = `colorSliderGrp -q -rgb edgeColor`;
+
+$o = `ls -sl -o`; 
+$ch = `listRelatives -c $o`; 
+select -r $ch;
+
+string $sl[] = `ls -sl`;
+int $numSel =size($sl);
+
+for( $i = 0; $i < $numSel; $i++ ){
+	setAttr ($sl[$i]+".overrideEnabled") 1;
+	setAttr ($sl[$i]+".overrideRGBColors") 1;
+	setAttr ($sl[$i]+".overrideColorRGB") ($edgeColor.x) ($edgeColor.y) ($edgeColor.z);
+}
+
+}
+
+
+//Red color//
+global proc redColorButtonAction() {
+
+$o = `ls -sl -o`; 
+$ch = `listRelatives -c $o`; 
+select -r $ch;
+
+string $sl[] = `ls -sl`;
+int $numSel =size($sl);
+
+for( $i = 0; $i < $numSel; $i++ ){
+		setAttr ($sl[$i]+".overrideEnabled") 1;
+		setAttr ($sl[$i]+".overrideRGBColors") 0;
+		setAttr ($sl[$i]+".overrideColor") 13;
+}
+}
+
+
+//Yellow color//
+global proc yellowColorButtonAction() {
+
+$o = `ls -sl -o`; 
+$ch = `listRelatives -c $o`; 
+select -r $ch;
+
+string $sl[] = `ls -sl`;
+int $numSel =size($sl);
+
+for( $i = 0; $i < $numSel; $i++ ){
+		setAttr ($sl[$i]+".overrideEnabled") 1;
+		setAttr ($sl[$i]+".overrideRGBColors") 0;
+		setAttr ($sl[$i]+".overrideColor") 17;
+}
+}
+
+
+//Blue color//
+global proc blueColorButtonAction() {
+
+$o = `ls -sl -o`; 
+$ch = `listRelatives -c $o`; 
+select -r $ch;
+
+string $sl[] = `ls -sl`;
+int $numSel =size($sl);
+
+for( $i = 0; $i < $numSel; $i++ ){
+		setAttr ($sl[$i]+".overrideEnabled") 1;
+		setAttr ($sl[$i]+".overrideRGBColors") 0;
+		setAttr ($sl[$i]+".overrideColor") 6;
+}
+}
+
+
+//Pink color//
+global proc pinkColorButtonAction() {
+
+$o = `ls -sl -o`; 
+$ch = `listRelatives -c $o`; 
+select -r $ch;
+
+string $sl[] = `ls -sl`;
+int $numSel =size($sl);
+
+for( $i = 0; $i < $numSel; $i++ ){
+		setAttr ($sl[$i]+".overrideEnabled") 1;
+		setAttr ($sl[$i]+".overrideRGBColors") 0;
+		setAttr ($sl[$i]+".overrideColor") 20;
+}
+}
+
+
+//Magenta color//
+global proc magentaColorButtonAction() {
+
+$o = `ls -sl -o`; 
+$ch = `listRelatives -c $o`; 
+select -r $ch;
+
+string $sl[] = `ls -sl`;
+int $numSel =size($sl);
+
+for( $i = 0; $i < $numSel; $i++ ){
+		setAttr ($sl[$i]+".overrideEnabled") 1;
+		setAttr ($sl[$i]+".overrideRGBColors") 0;
+		setAttr ($sl[$i]+".overrideColor") 9;
+}
+}
+
+
+//Cyan color//
+global proc cyanColorButtonAction() {
+
+$o = `ls -sl -o`; 
+$ch = `listRelatives -c $o`; 
+select -r $ch;
+
+string $sl[] = `ls -sl`;
+int $numSel =size($sl);
+
+for( $i = 0; $i < $numSel; $i++ ){
+		setAttr ($sl[$i]+".overrideEnabled") 1;
+		setAttr ($sl[$i]+".overrideRGBColors") 0;
+		setAttr ($sl[$i]+".overrideColor") 18;
+}
+}
+
+
+//Parent shapes to first selected object//
+global proc parButtonAction() {
+
+FreezeTransformations;
+
+string $select[] = `ls -sl`;
+string $shapes[] = `ls -shapes -dag -ap -sl`;
+//string $shapes[] = `listRelatives -ad -type shape`;
+select $shapes;
+select -add $select[0];
+parent -r -s;
+select -cl;
+select $select;
+select -tgl $select[0];
+delete;
+select $select[0];
+string $transform[] = `listRelatives -ad -type transform`;
+select $transform;
+delete;
+select $select[0];
+
+}
+
+
+////////////////////////////// Constraints and IK //////////////////////////////
+
+
+//Point constraint//
+global proc pointConstraintButtonAction() {
+
+string $defaultVal = `checkBox -query -value offsetcheck`;
+
+string $optionVal = `checkBox -query -value optionBoxcheck`;
+
+{
+	 
+		if ($defaultVal == 0) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreatePointConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+pointConstraint -offset 0 0 0 -weight 1;
+		}
+		}
+
+		if ($defaultVal == 1) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreatePointConstraintArgList 1 { "1","0","0","0","0","0","0","1","","1" };
+pointConstraint -mo -weight 1;
+		}
+		}
+		
+		if ($optionVal == 1) 
+		{
+			PointConstraintOptions;
+		}
+	}
+}
+
+
+//Orient constraint//
+global proc orientConstraintButtonAction() {
+
+string $defaultVal = `checkBox -query -value offsetcheck`;
+
+string $optionVal = `checkBox -query -value optionBoxcheck`;
+
+{
+	 
+		if ($defaultVal == 0) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreateOrientConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+orientConstraint -offset 0 0 0 -weight 1;
+		}
+		}
+
+		if ($defaultVal == 1) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreateOrientConstraintArgList 1 { "1","0","0","0","0","0","0","1","","1" };
+orientConstraint -mo -weight 1;
+		}
+		}
+ 
+		if ($optionVal == 1) 
+		{
+			OrientConstraintOptions;
+		}
+	}
+}
+
+
+//Scale constraint//
+global proc scaleConstraintButtonAction() {
+
+string $defaultVal = `checkBox -query -value offsetcheck`;
+
+string $optionVal = `checkBox -query -value optionBoxcheck`;
+
+{
+	 
+		if ($defaultVal == 0) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreateScaleConstraintArgList 1 { "0","1","1","1","0","0","0","1","","1" };
+scaleConstraint -offset 1 1 1 -weight 1;
+		}
+		}
+
+		if ($defaultVal == 1) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreateScaleConstraintArgList 1 { "1","1","1","1","0","0","0","1","","1" };
+scaleConstraint -mo -weight 1;
+		}
+		}
+		
+		if ($optionVal == 1) 
+		{
+			ScaleConstraintOptions;
+		}
+	}
+}
+
+
+//Parent constraint//
+global proc parentConstraintButtonAction() {
+
+string $defaultVal = `checkBox -query -value offsetcheck`;
+
+string $optionVal = `checkBox -query -value optionBoxcheck`;
+
+{
+	 
+		if ($defaultVal == 0) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreateParentConstraintArgList 1 { "0","0","0","0","0","0","0","1","","1" };
+parentConstraint -weight 1;
+		} 
+		}
+
+		if ($defaultVal == 1) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreateParentConstraintArgList 1 { "1","0","0","0","0","0","0","1","","1" };
+parentConstraint -mo -weight 1;
+		}
+		} 
+		
+		if ($optionVal == 1) 
+		{
+			ParentConstraintOptions;
+		}
+	}
+}
+
+
+//Aim constraint//
+global proc aimConstraintButtonAction() {
+
+string $defaultVal = `checkBox -query -value offsetcheck`;
+
+string $optionVal = `checkBox -query -value optionBoxcheck`;
+
+
+
+{
+	 
+		if ($defaultVal == 0) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreateAimConstraintArgList 1 { "0","0","0","0","1","0","0","0","1","0","0","1","0","1","vector","","0","0","0","","1" };
+aimConstraint -offset 0 0 0 -weight 1 -aimVector 1 0 0 -upVector 0 1 0 -worldUpType "vector" -worldUpVector 0 1 0;
+		}
+		}
+
+		if ($defaultVal == 1) 
+		{
+		if ($optionVal == 0) 
+		{
+			doCreateAimConstraintArgList 1 { "1","0","0","0","1","0","0","0","1","0","0","1","0","1","vector","","0","0","0","","1" };
+aimConstraint -mo -weight 1 -aimVector 1 0 0 -upVector 0 1 0 -worldUpType "vector" -worldUpVector 0 1 0;
+		}
+		}
+		
+		if ($optionVal == 1) 
+		{
+			AimConstraintOptions;
+		}
+	}
+}
+
+
+//Pole Vector constraint//
+global proc poleVectorConstraintButtonAction() {
+
+string $defaultVal = `checkBox -query -value offsetcheck`;
+
+string $optionVal = `checkBox -query -value optionBoxcheck`;
+
+{
+	 
+		if ($defaultVal == 0) 
+		{
+		if ($optionVal == 0) 
+		{
+			performPoleVectorConstraint 0;
+poleVectorConstraint -weight 1;
+		}
+		}
+
+		if ($defaultVal == 1) 
+		{
+		if ($optionVal == 0) 
+		{
+			print( "There is no offset option for this constraint!\n" );
+		}
+		}
+ 
+		if ($optionVal == 1) 
+		{
+			PoleVectorConstraintOptions;
+		}
+	}
+}
+
+
+//Remove Target//
+global proc removeTargetButtonAction() {
+
+RemoveConstraintTarget;
+performRemoveConstraintTarget 0;
+}
+
+
+//IK Handle Tool//
+global proc ikToolButtonAction() {
+
+IKHandleTool;
+}
+
+//IK Handle Tool Options//
+global proc ikToolOptionsButtonAction() {
+
+IKHandleToolOptions;
+}
+
+//IK Spline Handle Tool//
+global proc ikSplineToolButtonAction() {
+
+IKSplineHandleTool;
+}
+
+//IK Spline Handle Tool Options//
+global proc ikSplineToolOptionsButtonAction() {
+
+IKSplineHandleToolOptions;
+}
+
+
+////////////////////////////// Hierarchy and Channels //////////////////////////////
+
+
+//Replace in hierarchy (select the object then the object you want to replace with it)//
+global proc replaceInHierarchyButtonAction() {
+
+string $select[] = `ls -sl`;
+select -d;
+
+
+select -r $select[1];
+string $shapes[] = `listRelatives -c -type transform`;
+select -d;
+select -r $shapes;
+select -tgl $select[0];
+parent;
+select -d;
+
+select -r $select[1];
+pickWalk -d up;
+string $par[] = `ls -sl`;
+select -d;
+select -r $select[1];
+parent -w;
+select -d;
+
+select -r $select[0];
+select -tgl $par[0];
+parent;
+}
+
+//insert in hierarchy (select the object then the object you want it to be over)//
+global proc insertInHierarchyButtonAction() {
+
+string $select[] = `ls -sl`;
+select -d;
+
+select -r $select[1];
+pickWalk -d up;
+string $par[] = `ls -sl`;
+select -d;
+
+select -r $select[1];
+select -tgl $select[0];
+parent;
+select -d;
+
+select -r $select[0];
+select -tgl $par[0];
+parent;
+select -d;
+}
+
+//Remove from hierarchy (select the object you want removed from the hierarchy)//
+global proc removeFromHierarchyButtonAction() {
+
+string $select[] = `ls -sl`;
+select -d;
+
+select -r $select[0];
+pickWalk -d up;
+string $par[] = `ls -sl`;
+select -d;
+
+select -r $select[0];
+string $shapes[] = `listRelatives -c -type transform`;
+select -d;
+
+select -r $shapes;
+select -tgl $par[0];
+parent;
+select -d;
+
+select -r $select[0];
+parent -w;
+select -d;
+}
+
+
+//Select children and parent//
+global proc selectChildrenButtonAction() {
+
+string $select[] = `ls -sl`;
+string $shapes[] = `listRelatives -ad -type transform`;
+select -r $shapes;
+select -tgl $select;
+}
+
+
+//Make Selected Locked//
+global proc lockedButtonAction() {
+
+channelBoxCommand -lock;
+}
+
+
+//Make Selected Unlocked//
+global proc unlockedButtonAction() {
+
+channelBoxCommand -unlock;
+}
+
+
+//Make Selected Hidden//
+global proc hiddenButtonAction() {
+
+channelBoxCommand -unkeyable;
+}
+
+
+//Unhide All//
+global proc unhiddenButtonAction() {
+
+string $selectedList[] = `ls -sl`; 
+string $currentObject; 
+for ($currentObject in $selectedList) { 
+setAttr -keyable true {$currentObject + ".tx"}; 
+setAttr -keyable true {$currentObject + ".ty"}; 
+setAttr -keyable true {$currentObject + ".tz"}; 
+setAttr -keyable true {$currentObject + ".rx"};
+setAttr -keyable true {$currentObject + ".ry"}; 
+setAttr -keyable true {$currentObject + ".rz"}; 
+setAttr -keyable true {$currentObject + ".sx"}; 
+setAttr -keyable true {$currentObject + ".sy"}; 
+setAttr -keyable true {$currentObject + ".sz"}; 
+setAttr -keyable true {$currentObject + ".v"}; 
+}
+}
+
+
+//Make Selected Lock And Hide//
+global proc lockAndHideButtonAction() {
+
+channelBoxCommand -lockUnkeyable;
+}
+
+
+//Make Selected Nonkeyable//
+global proc nonkeyableButtonAction() {
+
+channelBoxCommand -unkeyableDisplayed;
+}
+
+
+//Make Selected Nonkeyable//
+global proc keyableButtonAction() {
+
+channelBoxCommand -keyable;
+}
+
+
+//Email me//
+global proc emailMeButtonAction() {
+
+launch -web "http://robertwebb3d.wix.com/robertwebb3d#!contact/c16fm";
+}
+
+
+
+
+
+
+showWindow $RRT2;
+window -e -wh 160 305 $RRT2;

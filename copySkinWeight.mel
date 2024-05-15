@@ -1,0 +1,119 @@
+global proc myCopyMeshSkinUI(){
+if(`window -ex myCopyMeshSkinWindow`)
+    deleteUI myCopyMeshSkinWindow;
+window -title "CopyMeshSkinWeight" myCopyMeshSkinWindow;
+    columnLayout -adjustableColumn true;
+    button -label "CopySkinW" -c myCopyMultSkinWeight;
+    separator;
+    text -l "帮助";
+    text -l "先选择要蒙皮和拷贝权重的模型，\n在加选蒙皮的模型，\n点按钮\n";
+    
+    columnLayout -adjustableColumn true;
+    button -label "CopyselfSkinW" -c myCopySelfSkinWeight;
+    separator;
+    text -l "帮助";
+    text -l "选择刷权重出错的模型，\n\n点按钮\n";
+    
+    columnLayout -adjustableColumn true;
+    button -label "CopyNewOldSkinW" -c myCopyOldSkinWeight;
+    separator;
+    text -l "帮助";
+    text -l "模型一一对应，old蒙皮物体添加后缀_skin\n\n点按钮\n";  
+    
+    window -e -widthHeight 240 220 myCopyMeshSkinWindow;
+showWindow myCopyMeshSkinWindow;
+}
+myCopyMeshSkinUI();
+global proc asSetSmoothBindOptions ()
+{
+optionVar
+-iv "multipleBindPosesOpt" 1
+-iv "bindMethod" 1
+-iv "bindTo" 2
+-iv "skinMethod" 1
+-iv "removeUnusedInfluences" 0
+-iv "colorizeSkeleton" 1
+-fv "maxInfl" 3
+-iv "normalizeWeights" 2
+-iv "obeyMaxInfl" 0;
+SmoothBindSkinOptions;
+} 
+global proc myCopyMultSkinWeight()
+{
+
+string $objName[]=`ls -sl -fl`; 
+select $objName[size($objName)-1]; 
+string $skinJoint[]=`skinCluster -q -inf`;   
+int $i;
+for($i=0;$i<size($objName)-1;$i++)
+{
+    asSetSmoothBindOptions;
+    if (`window -exists OptionBoxWindow`) deleteUI -window OptionBoxWindow;
+    //onCloseCommand;
+    saveOptionBoxSize();
+    select -cl;
+    select -r $objName[$i];
+    select -tgl $skinJoint ;
+    SmoothBindSkin;
+    select -cl;
+    select -r $objName[size($objName)-1];;
+    select -tgl $objName[$i] ;    
+    copySkinWeights  -noMirror -surfaceAssociation closestPoint -influenceAssociation closestJoint;
+}  
+}  
+
+global proc myCopySelfSkinWeight()
+{
+
+    string $objName[]=`ls -sl -fl`; 
+    select $objName[0];
+    duplicate -rr -n conmesh ; 
+    select $objName[0];
+    string $skinJoint[]=`skinCluster -q -inf`;
+    asSetSmoothBindOptions;
+    if (`window -exists OptionBoxWindow`) deleteUI -window OptionBoxWindow;
+    //onCloseCommand;
+    saveOptionBoxSize();	
+    select -cl;
+    select -r conmesh;
+    select -tgl $skinJoint ;
+    SmoothBindSkin;
+    select -cl;
+    select -r $objName[0];
+    select -tgl conmesh;    
+    copySkinWeights  -noMirror -surfaceAssociation closestPoint -influenceAssociation closestJoint;
+    select -cl;
+    select -r conmesh;
+    select -tgl $objName[0];   
+    copySkinWeights  -noMirror -surfaceAssociation closestPoint -influenceAssociation closestJoint;  
+    select -cl;
+    select -r conmesh;
+    delete;
+
+}
+
+// 根据命名 name_skin 的物体拷贝权重给 name的物体
+global proc myCopyOldSkinWeight()
+{
+
+string $objnewName[]=`ls -sl -fl`; 
+int $i;
+for($i=0;$i<size($objnewName);$i++)
+{
+
+    select -cl;
+    $objNameskin = $objnewName[$i] +"_skin";
+    select -r $objNameskin;
+    string $oldskinJoint[]=`skinCluster -q -inf`;
+
+    select -cl; 
+    select -r $objnewName[$i];     
+    select -tgl $oldskinJoint ;
+    SmoothBindSkin;
+    select -cl;
+    select -r $objNameskin;
+    select -tgl $objnewName[$i] ;    
+    copySkinWeights  -noMirror -surfaceAssociation closestPoint -influenceAssociation closestJoint;
+}  
+}  
+
